@@ -7,15 +7,20 @@ import (
 )
 
 type (
-	// Config
+	// Config -.
 	Config struct {
 		App App
+		Log Log
 	}
 
-	// App
+	// App -.
 	App struct {
 		Name    string `env:"APP_NAME,required"`
 		Version string `env:"APP_VERSION,required"`
+	}
+	// Log -.
+	Log struct {
+		Level string `env:"LOG_LEVEL,required"`
 	}
 )
 
