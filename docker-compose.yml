@@ -17,6 +17,24 @@ x-kafka-variables: &x-kafka-variables
   CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
 
 services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # App
+      APP_NAME: "homework-real-time"
+      APP_VERSION: "1.0.0"
+      # Logger
+      LOG_LEVEL: "debug"
+    ports:
+      - "8081:8081"
+    networks:
+      app_network:
+        aliases:
+          - app.lvh.me
+
   kafka:
     container_name: kafka
     image: confluentinc/cp-kafka:latest

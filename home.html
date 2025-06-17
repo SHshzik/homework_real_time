@@ -29,7 +29,7 @@ window.onload = function () {
     };
 
     if (window["WebSocket"]) {
-        conn = new WebSocket("ws://localhost:8081/ws");
+        conn = new WebSocket("ws://app.lvh.me:8081/ws");
         conn.onclose = function (evt) {
             var item = document.createElement("div");
             item.innerHTML = "<b>Connection closed.</b>";
