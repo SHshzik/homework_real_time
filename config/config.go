@@ -9,14 +9,23 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App App
-		Log Log
+		App   App
+		Log   Log
+		Redis Redis
 	}
 
 	// App -.
 	App struct {
 		Name    string `env:"APP_NAME,required"`
 		Version string `env:"APP_VERSION,required"`
+	}
+
+	// Redis
+	Redis struct {
+		Host string `env:"REDIS_HOST,required"`
+		Port string `env:"REDIS_PORT,required"`
+		// Password string `env:"REDIS_PASSWORD,required"`
+		// DB       int    `env:"REDIS_DB,required"`
 	}
 	// Log -.
 	Log struct {

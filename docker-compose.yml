@@ -1,21 +1,3 @@
-x-kafka-variables: &x-kafka-variables
-  KAFKA_BROKER_ID: 1
-  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-  KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-  KAFKA_PROCESS_ROLES: "broker,controller"
-  KAFKA_NODE_ID: 1
-  KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:29092"
-  KAFKA_LISTENERS: CONTROLLER://kafka:29092,PLAINTEXT://kafka:9092
-  KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-  KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
-  # KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-  CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-
 services:
   app:
     container_name: app
@@ -28,6 +10,9 @@ services:
       APP_VERSION: "1.0.0"
       # Logger
       LOG_LEVEL: "debug"
+      # Redis
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
     ports:
       - "8081:8081"
     networks:
@@ -35,33 +20,25 @@ services:
         aliases:
           - app.lvh.me
 
-  kafka:
-    container_name: kafka
-    image: confluentinc/cp-kafka:latest
-    environment:
-      <<: *x-kafka-variables
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "6379:6379"
     networks:
       app_network:
         aliases:
-          - kafka.lvh.me
+          - redis.lvh.me
 
-  kafka-ui:
-    container_name: kafka-ui
-    image: provectuslabs/kafka-ui:latest
-    depends_on:
-      - kafka
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
     ports:
-      - "8083:8080"
+      - "5540:5540"
     networks:
       app_network:
         aliases:
-          - kafka-ui.lvh.me
+          - redisinsight.lvh.me
 
 networks:
   app_network:
