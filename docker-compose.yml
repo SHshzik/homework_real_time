@@ -13,8 +13,10 @@ services:
       # Redis
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
+      # HTTP
+      HTTP_PORT: "8080"
     ports:
-      - "8081:8081"
+      - "8080:8080"
     networks:
       app_network:
         aliases:

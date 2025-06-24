@@ -12,6 +12,7 @@ type (
 		App   App
 		Log   Log
 		Redis Redis
+		HTTP  HTTP
 	}
 
 	// App -.
@@ -27,6 +28,12 @@ type (
 		// Password string `env:"REDIS_PASSWORD,required"`
 		// DB       int    `env:"REDIS_DB,required"`
 	}
+
+	// HTTP -.
+	HTTP struct {
+		Port string `env:"HTTP_PORT,required"`
+	}
+
 	// Log -.
 	Log struct {
 		Level string `env:"LOG_LEVEL,required"`

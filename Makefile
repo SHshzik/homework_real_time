@@ -30,3 +30,19 @@ deps: ### deps tidy + verify
 	go mod tidy && go mod verify
 .PHONY: deps
 
+format: ### Run code formatter
+	gofumpt -l -w .
+	gci write . --skip-generated -s standard -s default
+.PHONY: format
+
+linter-golangci: ### check by golangci linter
+	golangci-lint run
+.PHONY: linter-golangci
+
+linter-hadolint: ### check by hadolint linter
+	git ls-files --exclude='Dockerfile*' -i -o | xargs hadolint
+.PHONY: linter-hadolint
+
+linter-dotenv: ### check by dotenv linter
+	dotenv-linter
+.PHONY: linter-dotenv
