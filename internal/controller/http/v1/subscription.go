@@ -22,6 +22,7 @@ func NewSubscriptionRoutes(apiV1Group fiber.Router, t usecase.Subscription, l lo
 	subscriptionGroup := apiV1Group.Group("/subscriptions")
 	{
 		subscriptionGroup.Post("/", r.subscribe)
+		subscriptionGroup.Delete("/", r.unsubscribe)
 	}
 }
 
@@ -41,20 +42,18 @@ type subscriptionForm struct {
 // @Failure     500 {object} response
 // @Router      /subscriptions [post]
 func (r *subscriptionRoutes) subscribe(ctx *fiber.Ctx) error {
-	r.l.Info("subscribe")
-
 	formSubscription := subscriptionForm{}
 
 	err := ctx.BodyParser(&formSubscription)
 	if err != nil {
-		r.l.Error(err, "http - v1 - create")
+		r.l.Error(err, "http - v1 - subscribe")
 
 		return errorResponse(ctx, http.StatusUnprocessableEntity, "Bad subscription params")
 	}
 
 	err = r.v.Struct(formSubscription)
 	if err != nil {
-		r.l.Error(err, "http - v1 - create")
+		r.l.Error(err, "http - v1 - subscribe")
 
 		return errorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -63,12 +62,54 @@ func (r *subscriptionRoutes) subscribe(ctx *fiber.Ctx) error {
 
 	err = r.t.Subscribe(ctx.UserContext(), subscription)
 	if err != nil {
-		r.l.Error(err, "http - v1 - create")
+		r.l.Error(err, "http - v1 - subscribe")
 
 		return errorResponse(ctx, http.StatusUnprocessableEntity, "subscription not created")
 	}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"message": "Subscription created",
+	})
+}
+
+// @Summary     Unsubscribe from a notification
+// @Description Unsubscribe from a notification
+// @ID          unsubscribe
+// @Tags  	    subscriptions
+// @Accept      json
+// @Produce     json
+// @Success     204
+// @Failure     422 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /subscriptions [delete]
+func (r *subscriptionRoutes) unsubscribe(ctx *fiber.Ctx) error {
+	formSubscription := subscriptionForm{}
+
+	err := ctx.BodyParser(&formSubscription)
+	if err != nil {
+		r.l.Error(err, "http - v1 - unsubscribe")
+
+		return errorResponse(ctx, http.StatusUnprocessableEntity, "Bad subscription params")
+	}
+
+	err = r.v.Struct(formSubscription)
+	if err != nil {
+		r.l.Error(err, "http - v1 - unsubscribe")
+
+		return errorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
+
+	subscription := entity.NewSubscription(formSubscription.SubType, formSubscription.UserID)
+
+	err = r.t.Unsubscribe(ctx.UserContext(), subscription)
+	if err != nil {
+		r.l.Error(err, "http - v1 - unsubscribe")
+
+		return errorResponse(ctx, http.StatusUnprocessableEntity, "subscription not deleted")
+	}
+
+	return ctx.Status(http.StatusNoContent).JSON(fiber.Map{
+		"message": "Subscription deleted",
 	})
 }

@@ -24,5 +24,7 @@ func (uc *UseCase) Subscribe(ctx context.Context, subscription *entity.Subscript
 }
 
 func (uc *UseCase) Unsubscribe(ctx context.Context, subscription *entity.Subscription) error {
+	uc.rClient.SRem(ctx, subscription.Type, subscription.UserID)
+
 	return nil
 }

@@ -11,5 +11,6 @@ type (
 	// User -.
 	Subscription interface {
 		Subscribe(ctx context.Context, subscription *entity.Subscription) error
+		Unsubscribe(ctx context.Context, subscription *entity.Subscription) error
 	}
 )
