@@ -3,7 +3,7 @@ package subscription
 import (
 	"context"
 
-	"github.com/SHshzik/homework_real_time/internal/entity"
+	"github.com/SHshzik/homework_real_time/internal/domain"
 	"github.com/SHshzik/homework_real_time/pkg/logger"
 	"github.com/redis/go-redis/v9"
 )
@@ -17,13 +17,13 @@ func NewUseCase(l *logger.Logger, rClient *redis.Client) *UseCase {
 	return &UseCase{l: l, rClient: rClient}
 }
 
-func (uc *UseCase) Subscribe(ctx context.Context, subscription *entity.Subscription) error {
+func (uc *UseCase) Subscribe(ctx context.Context, subscription *domain.Subscription) error {
 	uc.rClient.SAdd(ctx, subscription.Type, subscription.UserID)
 
 	return nil
 }
 
-func (uc *UseCase) Unsubscribe(ctx context.Context, subscription *entity.Subscription) error {
+func (uc *UseCase) Unsubscribe(ctx context.Context, subscription *domain.Subscription) error {
 	uc.rClient.SRem(ctx, subscription.Type, subscription.UserID)
 
 	return nil

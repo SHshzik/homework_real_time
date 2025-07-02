@@ -18,9 +18,9 @@ run:
 	CGO_ENABLED=0 go run ./cmd
 .PHONY: run
 
-compose-up: ### Run docker compose (without backend and reverse proxy)
+up: ### Run docker compose (without backend and reverse proxy)
 	$(BASE_STACK) up --build -d redis redisinsight
-.PHONY: compose-up
+.PHONY: up
 
 compose-down: ### Down docker compose
 	$(BASE_STACK) down --remove-orphans

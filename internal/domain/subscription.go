@@ -1,4 +1,10 @@
-package entity
+package domain
+
+var (
+	SubscriptionTypeEmail = "email"
+	SubscriptionTypePush  = "push"
+	SubscriptionTypeWS    = "ws"
+)
 
 type Subscription struct {
 	Type   string

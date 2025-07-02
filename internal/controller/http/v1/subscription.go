@@ -3,7 +3,7 @@ package v1
 import (
 	"net/http"
 
-	"github.com/SHshzik/homework_real_time/internal/entity"
+	"github.com/SHshzik/homework_real_time/internal/domain"
 	"github.com/SHshzik/homework_real_time/internal/usecase"
 	"github.com/SHshzik/homework_real_time/pkg/logger"
 	"github.com/go-playground/validator/v10"
@@ -58,7 +58,7 @@ func (r *subscriptionRoutes) subscribe(ctx *fiber.Ctx) error {
 		return errorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	subscription := entity.NewSubscription(formSubscription.SubType, formSubscription.UserID)
+	subscription := domain.NewSubscription(formSubscription.SubType, formSubscription.UserID)
 
 	err = r.t.Subscribe(ctx.UserContext(), subscription)
 	if err != nil {
@@ -100,7 +100,7 @@ func (r *subscriptionRoutes) unsubscribe(ctx *fiber.Ctx) error {
 		return errorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	subscription := entity.NewSubscription(formSubscription.SubType, formSubscription.UserID)
+	subscription := domain.NewSubscription(formSubscription.SubType, formSubscription.UserID)
 
 	err = r.t.Unsubscribe(ctx.UserContext(), subscription)
 	if err != nil {

@@ -43,16 +43,16 @@ func Run(cfg *config.Config) {
 		server.HandleWebSocket(w, r)
 	})
 
-	email_message_handler := redis.EmailMessageHandler{Logger: l}
-	emailSubscriber := redis.NewSubscriber("notification:email", email_message_handler, rClient, l)
+	emailMessageHandler := redis.EmailMessageHandler{Logger: l, RClient: rClient}
+	emailSubscriber := redis.NewSubscriber("notification:email", emailMessageHandler, rClient, l)
 	go emailSubscriber.Listen(context.Background())
 
-	push_message_handler := redis.PushMessageHandler{Logger: l}
-	pushSubscriber := redis.NewSubscriber("notification:push", push_message_handler, rClient, l)
+	pushMessageHandler := redis.PushMessageHandler{Logger: l, RClient: rClient}
+	pushSubscriber := redis.NewSubscriber("notification:push", pushMessageHandler, rClient, l)
 	go pushSubscriber.Listen(context.Background())
 
-	web_socket_message_handler := redis.WebSocketMessageHandler{Logger: l}
-	webSocketSubscriber := redis.NewSubscriber("notification:web_socket", web_socket_message_handler, rClient, l)
+	webSocketMessageHandler := redis.WebSocketMessageHandler{Logger: l, RClient: rClient}
+	webSocketSubscriber := redis.NewSubscriber("notification:web_socket", webSocketMessageHandler, rClient, l)
 	go webSocketSubscriber.Listen(context.Background())
 
 	// Waiting signal
