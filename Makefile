@@ -30,6 +30,10 @@ deps: ### deps tidy + verify
 	go mod tidy && go mod verify
 .PHONY: deps
 
+swag-v1: ### swag init
+	swag init -g internal/controller/http/router.go
+.PHONY: swag-v1
+
 format: ### Run code formatter
 	gofumpt -l -w .
 	gci write . --skip-generated -s standard -s default

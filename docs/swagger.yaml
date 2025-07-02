@@ -1,0 +1,70 @@
+basePath: /v1
+definitions:
+  v1.response:
+    properties:
+      error:
+        example: message
+        type: string
+    type: object
+  v1.subscriptionResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Subscription CRUD
+  title: V1 API
+  version: "1.0"
+paths:
+  /subscriptions:
+    delete:
+      consumes:
+      - application/json
+      description: Unsubscribe from a notification
+      operationId: unsubscribe
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Unsubscribe from a notification
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Subscribe to a notification
+      operationId: subscribe
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/v1.subscriptionResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Subscribe to a notification
+      tags:
+      - subscriptions
+swagger: "2.0"

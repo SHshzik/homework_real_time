@@ -31,6 +31,10 @@ type subscriptionForm struct {
 	UserID  string `form:"user_id" validate:"required"`
 }
 
+type subscriptionResponse struct {
+	Message string `json:"message"`
+}
+
 // @Summary     Subscribe to a notification
 // @Description Subscribe to a notification
 // @ID          subscribe
@@ -67,8 +71,8 @@ func (r *subscriptionRoutes) subscribe(ctx *fiber.Ctx) error {
 		return errorResponse(ctx, http.StatusUnprocessableEntity, "subscription not created")
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"message": "Subscription created",
+	return ctx.Status(http.StatusCreated).JSON(subscriptionResponse{
+		Message: "Subscription created",
 	})
 }
 
@@ -109,7 +113,7 @@ func (r *subscriptionRoutes) unsubscribe(ctx *fiber.Ctx) error {
 		return errorResponse(ctx, http.StatusUnprocessableEntity, "subscription not deleted")
 	}
 
-	return ctx.Status(http.StatusNoContent).JSON(fiber.Map{
-		"message": "Subscription deleted",
+	return ctx.Status(http.StatusNoContent).JSON(subscriptionResponse{
+		Message: "Subscription deleted",
 	})
 }

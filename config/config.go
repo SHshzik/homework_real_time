@@ -9,10 +9,11 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App   App
-		Log   Log
-		Redis Redis
-		HTTP  HTTP
+		App     App
+		Log     Log
+		Redis   Redis
+		HTTP    HTTP
+		Swagger Swagger
 	}
 
 	// App -.
@@ -37,6 +38,10 @@ type (
 	// Log -.
 	Log struct {
 		Level string `env:"LOG_LEVEL,required"`
+	}
+
+	Swagger struct {
+		Enabled bool `env:"SWAGGER_ENABLED" envDefault:"false"`
 	}
 )
 
