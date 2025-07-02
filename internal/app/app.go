@@ -38,22 +38,28 @@ func Run(cfg *config.Config) {
 	// Start servers
 	httpServer.Start()
 
-	server := ws.NewHandler(hub, nil)
+	server := ws.NewHandler(hub, nil, l)
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		server.HandleWebSocket(w, r)
+		err := server.HandleWebSocket(w, r)
+		if err != nil {
+			l.Error(fmt.Errorf("app - Run - server.HandleWebSocket: %w", err))
+		}
 	})
 
 	emailMessageHandler := redis.EmailMessageHandler{Logger: l, RedisRepository: redisRepository}
 	emailSubscriber := redis.NewSubscriber("notification:email", emailMessageHandler, redisRepository, l)
+
 	go emailSubscriber.Listen(context.Background())
 
 	pushMessageHandler := redis.PushMessageHandler{Logger: l, RedisRepository: redisRepository}
 	pushSubscriber := redis.NewSubscriber("notification:push", pushMessageHandler, redisRepository, l)
+
 	go pushSubscriber.Listen(context.Background())
 
 	webSocketMessageHandler := redis.WebSocketMessageHandler{Logger: l, RedisRepository: redisRepository}
 	webSocketSubscriber := redis.NewSubscriber("notification:web_socket", webSocketMessageHandler, redisRepository, l)
+
 	go webSocketSubscriber.Listen(context.Background())
 
 	// Waiting signal

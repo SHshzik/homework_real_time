@@ -1,6 +1,6 @@
 package domain
 
-var (
+const (
 	SubscriptionTypeEmail = "email"
 	SubscriptionTypePush  = "push"
 	SubscriptionTypeWS    = "ws"

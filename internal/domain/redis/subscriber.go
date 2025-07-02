@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/SHshzik/homework_real_time/pkg/logger"
 )
@@ -23,7 +22,7 @@ func NewSubscriber(name string, handler Handler, repository *Repository, logger 
 	}
 }
 
-func (s *Subscriber) Listen(ctx context.Context) error {
+func (s *Subscriber) Listen(ctx context.Context) {
 	pubsub := s.repository.Subscribe(ctx, s.Name)
 	ch := pubsub.Channel()
 
@@ -31,10 +30,10 @@ func (s *Subscriber) Listen(ctx context.Context) error {
 		select {
 		case msg := <-ch:
 			if err := s.Handler.Call(ctx, msg.Payload); err != nil {
-				fmt.Printf("handler error: %v\n", err)
+				s.Logger.Error("handler error: %v\n", err)
 			}
 		case <-ctx.Done():
-			return ctx.Err()
+			s.Logger.Info("context done")
 		}
 	}
 }

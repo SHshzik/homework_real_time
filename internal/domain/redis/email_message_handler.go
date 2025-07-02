@@ -15,7 +15,11 @@ type EmailMessageHandler struct {
 
 func (h EmailMessageHandler) Call(ctx context.Context, message string) error {
 	messageEntity := new(domain.Message)
-	json.Unmarshal([]byte(message), messageEntity)
+
+	err := json.Unmarshal([]byte(message), messageEntity)
+	if err != nil {
+		return err
+	}
 
 	subscriptions := h.RedisRepository.FetchSubscriptions(ctx, domain.SubscriptionTypeEmail)
 	for _, subscription := range subscriptions {

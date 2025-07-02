@@ -22,10 +22,10 @@ func (r *Repository) Subscribe(ctx context.Context, subscriptionType string) *re
 	return r.rClient.Subscribe(ctx, subscriptionType)
 }
 
-func (r *Repository) AddSubscription(ctx context.Context, subscriptionType string, subscriptionID string) {
+func (r *Repository) AddSubscription(ctx context.Context, subscriptionType, subscriptionID string) {
 	r.rClient.SAdd(ctx, subscriptionType, subscriptionID)
 }
 
-func (r *Repository) RemoveSubscription(ctx context.Context, subscriptionType string, subscriptionID string) {
+func (r *Repository) RemoveSubscription(ctx context.Context, subscriptionType, subscriptionID string) {
 	r.rClient.SRem(ctx, subscriptionType, subscriptionID)
 }

@@ -22,7 +22,7 @@ type (
 		Version string `env:"APP_VERSION,required"`
 	}
 
-	// Redis
+	// Redis -.
 	Redis struct {
 		Host string `env:"REDIS_HOST,required"`
 		Port string `env:"REDIS_PORT,required"`

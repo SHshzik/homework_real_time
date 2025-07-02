@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/SHshzik/homework_real_time/pkg/logger"
 	"github.com/gorilla/websocket"
 )
 
@@ -15,8 +16,10 @@ const (
 	// Time allowed to read the next pong message from the peer.
 	pongWait = 60 * time.Second
 
+	periodCount = 9
+
 	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
+	pingPeriod = (pongWait * periodCount) / 10
 
 	// Maximum message size allowed from peer.
 	maxMessageSize = 512
@@ -27,11 +30,6 @@ var (
 	space   = []byte{' '}
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
 	hub *Hub
@@ -41,13 +39,16 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	logger logger.Interface
 }
 
-func NewClient(hub *Hub, conn *websocket.Conn, send chan []byte) *Client {
+func NewClient(hub *Hub, conn *websocket.Conn, send chan []byte, logger logger.Interface) *Client {
 	return &Client{
-		hub:  hub,
-		conn: conn,
-		send: send,
+		hub:    hub,
+		conn:   conn,
+		send:   send,
+		logger: logger,
 	}
 }
 
@@ -83,6 +84,7 @@ func (c *Client) ReadPump() {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
+
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
@@ -91,7 +93,7 @@ func (c *Client) ReadPump() {
 }
 
 // writePump pumps messages from the hub to the websocket connection.
-//
+// usecase
 // A goroutine running writePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
@@ -101,13 +103,22 @@ func (c *Client) WritePump() {
 		ticker.Stop()
 		c.conn.Close()
 	}()
+
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			err := c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err != nil {
+				c.logger.Error("error: %v", err)
+			}
+
 			if !ok {
 				// The hub closed the channel.
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				err := c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				if err != nil {
+					c.logger.Error("error: %v", err)
+				}
+
 				return
 			}
 
@@ -128,7 +139,11 @@ func (c *Client) WritePump() {
 				return
 			}
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			err := c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err != nil {
+				c.logger.Error("error: %v", err)
+			}
+
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}

@@ -52,7 +52,7 @@ func (r *subscriptionRoutes) subscribe(ctx *fiber.Ctx) error {
 	if err != nil {
 		r.l.Error(err, "http - v1 - subscribe")
 
-		return errorResponse(ctx, http.StatusUnprocessableEntity, "Bad subscription params")
+		return errorResponse(ctx, http.StatusBadRequest, "Bad subscription params")
 	}
 
 	err = r.v.Struct(formSubscription)
