@@ -24,11 +24,12 @@ func Run(cfg *config.Config) {
 
 	redisOptions := &rds.Options{Addr: fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)}
 	rClient := rds.NewClient(redisOptions)
+	redisRepository := redis.NewRepository(rClient)
 
 	hub := domain.NewHub()
 	go hub.Run()
 
-	subscriptionUseCase := subscription.NewUseCase(l, rClient)
+	subscriptionUseCase := subscription.NewUseCase(l, redisRepository)
 
 	// HTTP Server
 	httpServer := httpserver.New(httpserver.Port(cfg.HTTP.Port))
@@ -43,16 +44,16 @@ func Run(cfg *config.Config) {
 		server.HandleWebSocket(w, r)
 	})
 
-	emailMessageHandler := redis.EmailMessageHandler{Logger: l, RClient: rClient}
-	emailSubscriber := redis.NewSubscriber("notification:email", emailMessageHandler, rClient, l)
+	emailMessageHandler := redis.EmailMessageHandler{Logger: l, RedisRepository: redisRepository}
+	emailSubscriber := redis.NewSubscriber("notification:email", emailMessageHandler, redisRepository, l)
 	go emailSubscriber.Listen(context.Background())
 
-	pushMessageHandler := redis.PushMessageHandler{Logger: l, RClient: rClient}
-	pushSubscriber := redis.NewSubscriber("notification:push", pushMessageHandler, rClient, l)
+	pushMessageHandler := redis.PushMessageHandler{Logger: l, RedisRepository: redisRepository}
+	pushSubscriber := redis.NewSubscriber("notification:push", pushMessageHandler, redisRepository, l)
 	go pushSubscriber.Listen(context.Background())
 
-	webSocketMessageHandler := redis.WebSocketMessageHandler{Logger: l, RClient: rClient}
-	webSocketSubscriber := redis.NewSubscriber("notification:web_socket", webSocketMessageHandler, rClient, l)
+	webSocketMessageHandler := redis.WebSocketMessageHandler{Logger: l, RedisRepository: redisRepository}
+	webSocketSubscriber := redis.NewSubscriber("notification:web_socket", webSocketMessageHandler, redisRepository, l)
 	go webSocketSubscriber.Listen(context.Background())
 
 	// Waiting signal

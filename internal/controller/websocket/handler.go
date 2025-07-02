@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/SHshzik/homework_real_time/internal/domain"
@@ -9,13 +8,18 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
+var (
+	channelBufferSize = 256
+	readBufferSize    = 1024
+	writeBufferSize   = 1024
+	upgrader          = websocket.Upgrader{
+		ReadBufferSize:  readBufferSize,
+		WriteBufferSize: writeBufferSize,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+)
 
 type Handler struct {
 	hub                 *domain.Hub
@@ -32,10 +36,9 @@ func NewHandler(hub *domain.Hub, notificationUseCase *usecase.NotificationUseCas
 func (h *Handler) HandleWebSocket(w http.ResponseWriter, r *http.Request) error {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
-	client := domain.NewClient(h.hub, conn, make(chan []byte, 256))
+	client := domain.NewClient(h.hub, conn, make(chan []byte, channelBufferSize))
 	h.hub.Register <- client
 
 	go client.WritePump()
