@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	_defaultAddr            = ":80"
-	_defaultReadTimeout     = 5 * time.Second
-	_defaultWriteTimeout    = 5 * time.Second
-	_defaultShutdownTimeout = 3 * time.Second
+	defaultAddr            = ":80"
+	defaultReadTimeout     = 5 * time.Second
+	defaultWriteTimeout    = 5 * time.Second
+	defaultShutdownTimeout = 3 * time.Second
 )
 
 // Server -.
@@ -32,10 +32,10 @@ func New(opts ...Option) *Server {
 	s := &Server{
 		App:             nil,
 		notify:          make(chan error, 1),
-		address:         _defaultAddr,
-		readTimeout:     _defaultReadTimeout,
-		writeTimeout:    _defaultWriteTimeout,
-		shutdownTimeout: _defaultShutdownTimeout,
+		address:         defaultAddr,
+		readTimeout:     defaultReadTimeout,
+		writeTimeout:    defaultWriteTimeout,
+		shutdownTimeout: defaultShutdownTimeout,
 	}
 
 	// Custom options

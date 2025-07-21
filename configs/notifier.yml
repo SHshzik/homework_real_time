@@ -1,0 +1,16 @@
+app:
+  name: notifier
+  version: 1.0.0
+
+log:
+  level: debug
+
+redis:
+  host: localhost
+  port: 6379
+
+http:
+  port: 8080
+
+swagger:
+  enabled: true
