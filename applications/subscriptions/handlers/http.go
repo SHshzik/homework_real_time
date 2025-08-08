@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"github.com/SHshzik/homework_real_time/applications/subscriptions"
 	"github.com/SHshzik/homework_real_time/applications/subscriptions/domain"
-	"github.com/SHshzik/homework_real_time/applications/subscriptions/service"
 	"github.com/SHshzik/homework_real_time/pkg/logger"
 	"github.com/go-playground/validator/v10"
 )
@@ -13,12 +13,12 @@ type subscriptionForm struct {
 }
 
 type HTTPServer struct {
-	s *service.Service
+	s subscriptions.Service
 	l logger.Interface
 	v *validator.Validate
 }
 
-func NewHTTPServer(s *service.Service, l logger.Interface) *HTTPServer {
+func NewHTTPServer(s subscriptions.Service, l logger.Interface) *HTTPServer {
 	return &HTTPServer{s: s, l: l, v: validator.New()}
 }
 
