@@ -32,7 +32,7 @@ func (h *HTTPServer) Unsubscribe(ctx *fiber.Ctx) error {
 		return errorResponse(ctx, http.StatusUnprocessableEntity, "subscription not deleted")
 	}
 
-	return ctx.Status(http.StatusNoContent).JSON(subscriptionResponse{
-		Message: "Subscription deleted",
-	})
+	ctx.Status(http.StatusNoContent)
+
+	return nil
 }
