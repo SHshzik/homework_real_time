@@ -1,16 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/SHshzik/homework_real_time/applications/notifier/adapters/redis"
+	"github.com/SHshzik/homework_real_time/applications/notifier/config"
+	"github.com/SHshzik/homework_real_time/applications/notifier/handlers"
+	"github.com/SHshzik/homework_real_time/pkg/logger"
+	"github.com/SHshzik/homework_real_time/pkg/subscriber"
+	rds "github.com/redis/go-redis/v9"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/SHshzik/homework_real_time/applications/notifier/config"
-	"github.com/SHshzik/homework_real_time/applications/notifier/handlers"
-	"github.com/SHshzik/homework_real_time/pkg/httpserver"
-	"github.com/SHshzik/homework_real_time/pkg/logger"
 )
 
 func main() {
@@ -21,27 +23,18 @@ func main() {
 
 	l := logger.New(cfg.Log.Level)
 
-	httpServer := httpserver.New(httpserver.Port(cfg.HTTP.Port))
+	redisOptions := &rds.Options{Addr: fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)}
+	rClient := rds.NewClient(redisOptions)
+	redisRepository := redis.NewRepository(rClient)
 
-	handlers.NewRouter(httpServer.App, l)
-
-	// Start servers
-	httpServer.Start()
+	emailMessageHandler := handlers.EmailMessageHandler{Logger: l, RedisRepository: redisRepository}
+	emailSubscriber := subscriber.NewSubscriber("notification:email", emailMessageHandler, redisRepository, l)
+	go emailSubscriber.Listen(context.Background())
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
-	select {
-	case s := <-interrupt:
-		l.Info("app - Run - signal: " + s.String())
-	case err := <-httpServer.Notify():
-		l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
-	}
-
-	// Shutdown
-	err = httpServer.Shutdown()
-	if err != nil {
-		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
-	}
+	s := <-interrupt
+	l.Info("app - Run - signal: " + s.String())
 }

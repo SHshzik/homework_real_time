@@ -49,12 +49,10 @@ func Run(cfg *config.Config) {
 
 	emailMessageHandler := redis.EmailMessageHandler{Logger: l, RedisRepository: redisRepository}
 	emailSubscriber := redis.NewSubscriber("notification:email", emailMessageHandler, redisRepository, l)
-
 	go emailSubscriber.Listen(context.Background())
 
 	pushMessageHandler := redis.PushMessageHandler{Logger: l, RedisRepository: redisRepository}
 	pushSubscriber := redis.NewSubscriber("notification:push", pushMessageHandler, redisRepository, l)
-
 	go pushSubscriber.Listen(context.Background())
 
 	webSocketMessageHandler := redis.WebSocketMessageHandler{Logger: l, RedisRepository: redisRepository}

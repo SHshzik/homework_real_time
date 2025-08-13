@@ -5,11 +5,9 @@ import "github.com/spf13/viper"
 type (
 	// Config -.
 	Config struct {
-		App     App
-		Log     Log
-		Redis   Redis
-		HTTP    HTTP
-		Swagger Swagger
+		App   App
+		Log   Log
+		Redis Redis
 	}
 
 	// App -.
@@ -27,15 +25,6 @@ type (
 	Redis struct {
 		Host string
 		Port string
-	}
-
-	// HTTP -.
-	HTTP struct {
-		Port string
-	}
-
-	Swagger struct {
-		Enabled bool
 	}
 )
 

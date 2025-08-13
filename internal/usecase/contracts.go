@@ -6,7 +6,6 @@ import (
 	"github.com/SHshzik/homework_real_time/internal/domain"
 )
 
-//go:generate mockgen -source=interfaces.go -destination=./mocks_usecase_test.go -package=usecase_test
 type (
 	// User -.
 	Subscription interface {
