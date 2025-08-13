@@ -31,6 +31,10 @@ func main() {
 	emailSubscriber := subscriber.NewSubscriber("notification:email", emailMessageHandler, redisRepository, l)
 	go emailSubscriber.Listen(context.Background())
 
+	pushMessageHandler := handlers.NewPushMessageHandler(l, redisRepository)
+	pushSubscriber := subscriber.NewSubscriber("notification:push", pushMessageHandler, redisRepository, l)
+	go pushSubscriber.Listen(context.Background())
+
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
