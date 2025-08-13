@@ -3,15 +3,21 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/SHshzik/homework_real_time/applications/notifier/domain"
 	"github.com/SHshzik/homework_real_time/applications/notifier/interfaces"
 	"github.com/SHshzik/homework_real_time/pkg/logger"
 )
 
 type EmailMessageHandler struct {
-	Logger          *logger.Logger
-	RedisRepository interfaces.SubscriptionRepository
+	l   logger.Interface
+	rep interfaces.SubscriptionRepository
+}
+
+func NewEmailMessageHandler(l logger.Interface, rep interfaces.SubscriptionRepository) *EmailMessageHandler {
+	return &EmailMessageHandler{
+		l:   l,
+		rep: rep,
+	}
 }
 
 func (h EmailMessageHandler) Call(ctx context.Context, message string) error {
@@ -21,11 +27,10 @@ func (h EmailMessageHandler) Call(ctx context.Context, message string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(messageEntity)
 
-	subscriptions := h.RedisRepository.FetchSubscriptions(ctx, domain.SubscriptionTypeEmail)
+	subscriptions := h.rep.FetchSubscriptions(ctx, domain.SubscriptionTypeEmail)
 	for _, subscription := range subscriptions {
-		h.Logger.Info("send message (%#v) to subscription: %#v", messageEntity, subscription)
+		h.l.Info("send message (%#v) to subscription: %#v", messageEntity, subscription)
 	}
 
 	return nil

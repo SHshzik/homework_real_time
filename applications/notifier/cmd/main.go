@@ -27,7 +27,7 @@ func main() {
 	rClient := rds.NewClient(redisOptions)
 	redisRepository := redis.NewRepository(rClient)
 
-	emailMessageHandler := handlers.EmailMessageHandler{Logger: l, RedisRepository: redisRepository}
+	emailMessageHandler := handlers.NewEmailMessageHandler(l, redisRepository)
 	emailSubscriber := subscriber.NewSubscriber("notification:email", emailMessageHandler, redisRepository, l)
 	go emailSubscriber.Listen(context.Background())
 
